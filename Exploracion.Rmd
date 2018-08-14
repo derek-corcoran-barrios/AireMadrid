@@ -1,0 +1,31 @@
+---
+title: "Exploración aire Madrid"
+author: "Derek Corcoran"
+date: "8/14/2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+```{r cargadatos}
+library(tidyverse)
+library(knitr)
+library(lubridate)
+stations <- read_csv("stations.csv") %>% rename(station = id)
+
+madrid_2017 <- read_csv("csvs_per_year/madrid_2017.csv") %>% select(CO, date, station) %>% filter(!is.na(CO)) %>% mutate(Mes = month(date)) %>% full_join(stations) %>% select(-station, - address)
+
+```
+
+
+Este documento realiza una exploración de datos, por ejemplo el promedio de concentración de monoxido de carbono en Madrid en el año 2017 fue de `r round(mean(madrid_2017$CO, na.rm = TRUE), 2)`.
+
+En la tabla 1 tenemos las concentraciónes promedio de monoxido de carbono para cada estación
+
+```{r Resumen}
+Resumen <- madrid_2017 %>% group_by(Mes) %>% summarise(CO = mean(CO))
+kable(Resumen, caption = "Tabla 1. En esta tabla se observa la media y desviación estándar de el monoxido de carbono en distintas estaciones de Madrid", digits = 2)
+```
+
